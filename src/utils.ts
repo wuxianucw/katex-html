@@ -128,6 +128,8 @@ export function unescapeHTML(html: string): string {
             const num = parseInt(entity.slice(1), 10);
             if (!isNaN(num)) {
                 result += String.fromCharCode(num);
+            } else {
+                result += '&' + entity + ';'; // restore
             }
         } else {
             result += entityMap[entity];
