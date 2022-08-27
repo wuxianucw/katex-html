@@ -43,7 +43,7 @@ describe('render', () => {
         expect(output).toBe(expected);
     });
 
-    it('should not render in exluded tags', () => {
+    it('should not render in excluded tags', () => {
         const math = new Math('1 + 1 = 2', '$');
         const input = `<p>${math.raw()}</p>${math.raw()}<div>${math.raw()}</div>`;
         const expected = `<p>${math.raw()}</p>${math.html()}<div>${math.html()}</div>`;
