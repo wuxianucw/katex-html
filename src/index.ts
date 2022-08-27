@@ -1,5 +1,5 @@
 import katex, { KatexOptions } from 'katex';
-import buildSplitter, { Delimiter, Group } from './buildSplitter';
+import { buildSplitter, unescapeHTML, Delimiter } from './utils';
 import visit from './visit';
 
 export interface RenderOptions {
@@ -35,17 +35,19 @@ const defaultOptions: Options = {
 
 export function render(input: string, options: Options): string {
     const opts = { ...defaultOptions, ...options };
+    opts.excludedTags?.map((tag) => tag.toLowerCase());
     const split = buildSplitter(opts.delimiters!!);
     return visit(input, (text) => {
         const data = split(text);
         if (data.length === 1 && data[0].type === 'text') {
+            // hotspot
             return data[0].data;
         }
         return data.reduce((acc, x) => {
             if (x.type === 'text') {
                 return acc + x.data;
             }
-            return acc + katex.renderToString(x.data, { ...opts, displayMode: x.display });
+            return acc + katex.renderToString(unescapeHTML(x.data), { ...opts, displayMode: x.display });
         }, '');
     }, opts.excludedTags!!);
 }

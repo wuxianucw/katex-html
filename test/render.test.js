@@ -50,4 +50,27 @@ describe('render', () => {
         const output = render(input, { excludedTags: ['p'] });
         expect(output).toBe(expected);
     });
+
+    it('should work with escaped html text', () => {
+        const input = '$ 114 &lt; 514 $&amp;';
+        const expected = `${katex.renderToString(' 114 < 514 ')}&amp;`;
+        const output = render(input);
+        expect(output).toBe(expected);
+    });
+
+    it('should recognize self-closing tags', () => {
+        const math = new Math('1 + 1 = 2', '$');
+        const input = `$<img src="test.png" />$<input type="text">$<p>${math.raw()}</p>`;
+        const expected = `$<img src="test.png" />$<input type="text">$<p>${math.html()}</p>`;
+        const output = render(input);
+        expect(output).toBe(expected);
+    });
+
+    it('should be case insensitive with tags', () => {
+        const math = new Math('1 + 1 = 2', '$');
+        const input = `<PRE>${math.raw()}</PRE><Img>${math.raw()}<Div>${math.raw()}</Div>`;
+        const expected = `<PRE>${math.raw()}</PRE><Img>${math.html()}<Div>${math.html()}</Div>`;
+        const output = render(input);
+        expect(output).toBe(expected);
+    });
 });

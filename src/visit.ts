@@ -19,7 +19,7 @@ export default function visit(input: string, callback: (text: string) => string,
                 throw new Error('Unterminated tag');
             }
             result += input.substring(pos, end + 1);
-            const tag = input.slice(pos + 1, end).split(' ')[0];
+            const tag = input.slice(pos + 1, end).split(' ')[0].toLowerCase();
             if (tag.startsWith('/')) {
                 if (stack.length === 0 || stack[stack.length - 1] !== tag.slice(1)) {
                     throw new Error('Unmatched closing tag');
