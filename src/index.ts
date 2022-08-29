@@ -1,5 +1,5 @@
 import katex, { KatexOptions } from 'katex';
-import { buildSplitter, unescapeHTML, Delimiter } from './utils';
+import { buildSplitter, unescapeHTML, Delimiter, Splitter } from './utils';
 import visit from './visit';
 
 export interface RenderOptions {
@@ -29,17 +29,29 @@ const defaultOptions: Options = {
     macros: {},
 };
 
-export function render(input: string, options?: Options): string {
-    const opts = { ...defaultOptions, ...options };
-    opts.excludedTags!!.map((tag) => tag.toLowerCase());
-    const split = buildSplitter(opts.delimiters!!);
-    return visit(input, (text) => {
-        const data = split(text);
-        return data.reduce((acc, x) => {
-            if (x.type === 'text') {
-                return acc + x.data;
-            }
-            return acc + katex.renderToString(unescapeHTML(x.data), { ...opts, displayMode: x.display });
-        }, '');
-    }, opts.excludedTags!!);
+export class Renderer {
+    private options: Options;
+    private split: Splitter;
+
+    constructor(options: Options = {}) {
+        this.options = { ...defaultOptions, ...options };
+        this.options.excludedTags!!.map((tag) => tag.toLowerCase());
+        this.split = buildSplitter(this.options.delimiters!!);
+    }
+
+    render(input: string): string {
+        return visit(input, (text) => {
+            const data = this.split(text);
+            return data.reduce((acc, x) => {
+                if (x.type === 'text') {
+                    return acc + x.data;
+                }
+                return acc + katex.renderToString(unescapeHTML(x.data), { ...this.options, displayMode: x.display });
+            }, '');
+        }, this.options.excludedTags!!);
+    }
+}
+
+export function render(input: string, options: Options = {}): string {
+    return new Renderer(options).render(input);
 }

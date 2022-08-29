@@ -1,4 +1,4 @@
-import { render } from '../src/index';
+import { render, Renderer } from '../src/index';
 import katex from 'katex';
 
 class Math {
@@ -41,10 +41,11 @@ describe('render', () => {
             '<p> $ </div>',
             '<p> $$ 1 + 1 = 2 $$',
         ];
-        expect(() => render(input[0])).toThrow(new Error('Unterminated tag'));
-        expect(() => render(input[1])).toThrow(new Error('Unmatched closing tag'));
-        expect(() => render(input[2])).toThrow(new Error('Unmatched closing tag'));
-        expect(() => render(input[3])).toThrow(new Error('Unmatched opening tag'));
+        const renderer = new Renderer();
+        expect(() => renderer.render(input[0])).toThrow(new Error('Unterminated tag'));
+        expect(() => renderer.render(input[1])).toThrow(new Error('Unmatched closing tag'));
+        expect(() => renderer.render(input[2])).toThrow(new Error('Unmatched closing tag'));
+        expect(() => renderer.render(input[3])).toThrow(new Error('Unmatched opening tag'));
     });
 
     it('should render math in text nodes', () => {
