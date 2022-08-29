@@ -1,13 +1,15 @@
-const { render } = require('../dist/index.js');
-const katex = require('katex');
+import { render } from '../src/index';
+import katex from 'katex';
 
 class Math {
-    constructor(expr, wrapper) {
+    expr: string;
+    wrapper: string;
+    display: boolean;
+
+    constructor(expr: string, wrapper: string) {
         this.expr = expr;
         this.wrapper = wrapper;
         this.display = wrapper === '$$';
-        this.raw = this.raw.bind(this);
-        this.html = this.html.bind(this);
     }
 
     raw() {
@@ -27,9 +29,22 @@ describe('render', () => {
     });
 
     it('should not break html structure', () => {
-        const input = '<p>$</p><p>$</p><p>$$</p><p>$$</p>';
+        const input = '<p> $ </p><p> $ </p><p> $$ </p><p> $$ </p>';
         const output = render(input);
         expect(output).toBe(input);
+    });
+
+    it('throws error when html structure is broken', () => {
+        const input = [
+            '<p $$ 1 + 1 = 2 $$',
+            '<p> $ </p></p> $$',
+            '<p> $ </div>',
+            '<p> $$ 1 + 1 = 2 $$',
+        ];
+        expect(() => render(input[0])).toThrow(new Error('Unterminated tag'));
+        expect(() => render(input[1])).toThrow(new Error('Unmatched closing tag'));
+        expect(() => render(input[2])).toThrow(new Error('Unmatched closing tag'));
+        expect(() => render(input[3])).toThrow(new Error('Unmatched opening tag'));
     });
 
     it('should render math in text nodes', () => {
@@ -70,6 +85,13 @@ describe('render', () => {
         const math = new Math('1 + 1 = 2', '$');
         const input = `<PRE>${math.raw()}</PRE><Img>${math.raw()}<Div>${math.raw()}</Div>`;
         const expected = `<PRE>${math.raw()}</PRE><Img>${math.html()}<Div>${math.html()}</Div>`;
+        const output = render(input);
+        expect(output).toBe(expected);
+    });
+
+    it('should recognize AMS environment even without `$$...$$`', () => {
+        const input = '\\begin{align} x + y = z \\end{align}';
+        const expected = katex.renderToString(input, { displayMode: true });
         const output = render(input);
         expect(output).toBe(expected);
     });

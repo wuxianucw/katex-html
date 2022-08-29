@@ -45,5 +45,9 @@ export default function visit(input: string, callback: (text: string) => string,
         }
     }
 
+    if (stack.length > 0) {
+        throw new Error('Unmatched opening tag');
+    }
+
     return result;
 }

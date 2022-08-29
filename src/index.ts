@@ -16,14 +16,10 @@ const defaultOptions: Options = {
         { left: "$", right: "$", display: false },
         { left: '\\[', right: '\\]', display: true },
         { left: '\\(', right: '\\)', display: false },
-        { left: '\\begin{equation*}', right: '\\end{equation*}', display: true },
-        { left: '\\begin{equation}', right: '\\end{equation}', display: false },
-        { left: '\\begin{align*}', right: '\\end{align*}', display: true },
-        { left: '\\begin{align}', right: '\\end{align}', display: false },
-        { left: '\\begin{gather*}', right: '\\end{gather*}', display: true },
-        { left: '\\begin{gather}', right: '\\end{gather}', display: false },
-        { left: '\\begin{alignat*}', right: '\\end{alignat*}', display: true },
-        { left: '\\begin{alignat}', right: '\\end{alignat}', display: false },
+        { left: '\\begin{equation}', right: '\\end{equation}', display: true },
+        { left: '\\begin{align}', right: '\\end{align}', display: true },
+        { left: '\\begin{gather}', right: '\\end{gather}', display: true },
+        { left: '\\begin{alignat}', right: '\\end{alignat}', display: true },
         { left: '\\begin{CD}', right: '\\end{CD}', display: true },
     ],
     excludedTags: ['script', 'noscript', 'style', 'pre', 'code', 'kbd', 'samp', 'var', 'math', 'svg', 'textarea', 'option'],
@@ -33,16 +29,12 @@ const defaultOptions: Options = {
     macros: {},
 };
 
-export function render(input: string, options: Options): string {
+export function render(input: string, options?: Options): string {
     const opts = { ...defaultOptions, ...options };
-    opts.excludedTags?.map((tag) => tag.toLowerCase());
+    opts.excludedTags!!.map((tag) => tag.toLowerCase());
     const split = buildSplitter(opts.delimiters!!);
     return visit(input, (text) => {
         const data = split(text);
-        if (data.length === 1 && data[0].type === 'text') {
-            // hotspot
-            return data[0].data;
-        }
         return data.reduce((acc, x) => {
             if (x.type === 'text') {
                 return acc + x.data;
