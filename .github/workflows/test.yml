@@ -1,0 +1,28 @@
+name: Test
+
+on: ["push", "pull_request"]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3.4.1
+      with:
+        node-version: 16.x
+
+    - name: Run tests
+      run: |
+        yarn
+        yarn test --coverage && cat ./coverage/lcov.info
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
