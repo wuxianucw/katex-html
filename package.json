@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "npx spack",
+    "build": "swc ./src -d dist",
     "test": "jest"
   },
   "dependencies": {
